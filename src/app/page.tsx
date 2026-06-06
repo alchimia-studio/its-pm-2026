@@ -16,7 +16,7 @@ export default function Home() {
       {/* Eyebrow / corso */}
       <header className="w-full max-w-3xl pt-6 text-center">
         <p className="text-sm font-medium tracking-[0.2em] text-[#005ca9] uppercase">
-          Corso ITS · Intelligenza Artificiale e Strumenti Generativi
+          Intelligenza Artificiale e Strumenti Generativi
         </p>
       </header>
 
@@ -35,21 +35,20 @@ export default function Home() {
         </h1>
 
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-balance text-slate-600">
-          Un progetto reale, costruito passo dopo passo dagli studenti nel ruolo
-          di project manager con il supporto dell&apos;intelligenza artificiale.
-          L&apos;idea prende forma in classe: questa pagina crescerà insieme a
-          noi.
+          Un progetto reale, costruito passo dopo passo dagli studenti con il
+          supporto dell&apos;intelligenza artificiale. L&apos;idea prende forma
+          in classe: questa pagina crescerà insieme a noi.
         </p>
       </section>
 
       {/* Partner / branding */}
       <footer className="w-full max-w-3xl pb-4">
         <div className="flex flex-col items-center gap-6">
-          <div className="flex flex-col items-center gap-x-10 gap-y-6 sm:flex-row sm:items-end">
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
-                Un progetto di
-              </span>
+          <div className="flex flex-col items-center gap-3">
+            <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+              In collaborazione con
+            </span>
+            <div className="flex flex-col items-center gap-x-10 gap-y-6 sm:flex-row sm:items-end">
               <div className="flex h-20 items-center justify-center rounded-xl bg-white px-6 shadow-sm ring-1 ring-slate-200">
                 <Image
                   src="/loghi/lga.jpg"
@@ -60,12 +59,7 @@ export default function Home() {
                   priority
                 />
               </div>
-            </div>
 
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
-                In collaborazione con
-              </span>
               <div className="flex h-20 items-center justify-center rounded-xl bg-white px-6 shadow-sm ring-1 ring-slate-200">
                 <Image
                   src="/loghi/confindustria.jpg"
@@ -80,7 +74,7 @@ export default function Home() {
           </div>
 
           <p className="text-center text-sm text-slate-500">
-            Percorso ITS Project &amp; Innovation Manager · Edizione 2026
+            Corso ITS Project &amp; Innovation Manager · Edizione 2025/2026
           </p>
         </div>
       </footer>
