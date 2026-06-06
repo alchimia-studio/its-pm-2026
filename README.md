@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ITS PM 2026 — Progetto AI della classe
 
-## Getting Started
+Progetto pratico del corso ITS **"Intelligenza Artificiale e strumenti generativi"** (percorso
+*Project & Innovation Manager*), promosso da **LGA — ITS Leading Generation Academy** in
+collaborazione con **Confindustria Alto Milanese**.
 
-First, run the development server:
+Gli studenti lavorano come **project manager** e definiscono il prodotto da realizzare; il docente
+cura la parte tecnica con il supporto di **Claude Code**. Il prodotto finale sarà deciso insieme
+alla classe — per ora il sito mostra una pagina di presentazione.
+
+## Tecnologie
+
+- [Next.js 16](https://nextjs.org) (App Router) + TypeScript
+- [Tailwind CSS](https://tailwindcss.com)
+- Deploy automatico su [Vercel](https://vercel.com)
+
+## Avvio in locale
+
+Serve [Node.js 22](https://nodejs.org) (vedi `.nvmrc`: basta `nvm use`).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install      # installa le dipendenze (la prima volta)
+npm run dev      # avvia http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Altri comandi: `npm run build`, `npm run lint`, `npm run format`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Ogni commit su `main` viene pubblicato automaticamente da Vercel. Per la configurazione iniziale
+vedi **[DEPLOY.md](./DEPLOY.md)**.
 
-## Learn More
+## Come è organizzato
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/` — pagine e layout dell'applicazione
+- `public/loghi/` — loghi dei partner
+- `CLAUDE.md` — guida per lavorare con Claude Code
+- `docs/superpowers/` — spec e piani del progetto
