@@ -1,7 +1,7 @@
 # ITS PM 2026 — Progetto AI della classe
 
 Progetto pratico del corso ITS **"Intelligenza Artificiale e strumenti generativi"** (percorso
-*Project & Innovation Manager*), promosso da **LGA — ITS Leading Generation Academy** in
+_Project & Innovation Manager_), promosso da **LGA — ITS Leading Generation Academy** in
 collaborazione con **Confindustria Alto Milanese**.
 
 Gli studenti lavorano come **project manager** e definiscono il prodotto da realizzare; il docente

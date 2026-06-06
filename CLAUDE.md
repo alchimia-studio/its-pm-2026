@@ -5,7 +5,7 @@ Questo file orienta Claude Code quando lavora su questo repository. Leggilo prim
 ## Cos'è questo progetto
 
 Repository di un **progetto pratico** del corso ITS **"Intelligenza Artificiale e strumenti
-generativi"** (percorso *Project & Innovation Manager*), promosso da **LGA — ITS Leading
+generativi"** (percorso _Project & Innovation Manager_), promosso da **LGA — ITS Leading
 Generation Academy** con **Confindustria Alto Milanese**.
 
 - Gli **studenti** (19-20 anni, senza competenze di programmazione) lavorano come **project
@@ -32,7 +32,7 @@ npm run format   # Prettier (formattazione del codice)
 ## Workflow e deploy
 
 - Il branch **`main`** è collegato a **Vercel**: **ogni push su `main` fa un deploy automatico in
-  produzione**; gli altri branch generano *preview deploy*.
+  produzione**; gli altri branch generano _preview deploy_.
 - Per questo **`main` deve sempre buildare**. Configurazione iniziale: vedi `DEPLOY.md`.
 
 ## Definition of done (prima di ogni commit)

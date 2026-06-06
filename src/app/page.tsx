@@ -35,9 +35,10 @@ export default function Home() {
         </h1>
 
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-balance text-slate-600">
-          Un progetto reale, costruito passo dopo passo dagli studenti nel ruolo di
-          project manager con il supporto dell&apos;intelligenza artificiale.
-          L&apos;idea prende forma in classe: questa pagina crescerà insieme a noi.
+          Un progetto reale, costruito passo dopo passo dagli studenti nel ruolo
+          di project manager con il supporto dell&apos;intelligenza artificiale.
+          L&apos;idea prende forma in classe: questa pagina crescerà insieme a
+          noi.
         </p>
       </section>
 

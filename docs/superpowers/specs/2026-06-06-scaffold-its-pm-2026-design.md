@@ -7,7 +7,7 @@
 ## 1. Contesto
 
 Repository per un progetto pratico del corso ITS **"Intelligenza Artificiale e strumenti
-generativi"** (percorso *Project & Innovation Manager*). La classe (19 studenti, 19-20 anni,
+generativi"** (percorso _Project & Innovation Manager_). La classe (19 studenti, 19-20 anni,
 **senza competenze di programmazione**) lavora come **project manager**: definisce e coordina il
 prodotto. Il **docente cura la parte tecnica** con il supporto di **Claude Code**.
 
@@ -32,7 +32,7 @@ Massima flessibilità sul prodotto futuro: nessuna scelta tecnica irreversibile 
 - **YAGNI**: niente motore di gioco, database, autenticazione o testing finché non servono.
 - **Tutto in italiano**: README, `CLAUDE.md`, `DEPLOY.md`, pagina placeholder, messaggi di
   commit e commenti (la classe legge questi file).
-- **`main` sempre verde**: la *definition of done* di ogni modifica è `npm run build` e
+- **`main` sempre verde**: la _definition of done_ di ogni modifica è `npm run build` e
   `npm run lint` puliti, così il deploy live non si rompe mai davanti agli studenti.
 
 ## 4. Stack tecnico
@@ -76,15 +76,17 @@ its-pm-2026/
 
 Una landing pulita, moderna e **responsive**, in italiano, che comunica:
 
-- **Nome/identità del progetto** e che è un progetto del corso ITS *"AI e strumenti generativi"*.
+- **Nome/identità del progetto** e che è un progetto del corso ITS _"AI e strumenti generativi"_.
 - **Stato "in costruzione con la classe"** (work in progress).
-- **Branding partner**: fascia dedicata "**Un progetto di** *LGA — ITS Leading Generation
-  Academy*" e "**in collaborazione con** *Confindustria Alto Milanese*".
+- **Branding partner**: fascia dedicata "**Un progetto di** _LGA — ITS Leading Generation
+  Academy_" e "**in collaborazione con** _Confindustria Alto Milanese_".
 
 **Palette** (accenti dai colori LGA; valori da rifinire campionando i file):
+
 - Blu primario `~#005CA9`, verde lime accento `~#C0D11A`, blu acciaio Confindustria `~#2E5C9A`.
 
 **Gestione loghi:**
+
 - File spostati da `images/` a **`public/loghi/`** (la cartella `images/` a root viene rimossa).
 - Mostrati con **`next/image`** (ridimensionamento/ottimizzazione automatici; i file sorgente sono
   grandi: 2000×1033 e 2143×1419).
@@ -99,6 +101,7 @@ lime e i loghi in una fascia "credits". Nessuna libreria UI pesante.
 ## 7. Strumentazione per Claude Code
 
 ### `CLAUDE.md` (italiano)
+
 - **Contesto** del corso e dei ruoli: studenti = PM (non programmatori), docente = parte tecnica.
 - **Stack e convenzioni**: App Router, TypeScript, Tailwind, dove va cosa (`src/app`, `public/`).
 - **Comandi**: `npm run dev`, `npm run build`, `npm run lint`.
@@ -108,6 +111,7 @@ lime e i loghi in una fascia "credits". Nessuna libreria UI pesante.
   davanti/insieme agli studenti-PM); commit e testi in italiano.
 
 ### `.claude/settings.json`
+
 Allowlist di permessi per comandi **sicuri e frequenti**, così in classe Claude Code chiede meno
 conferme. Indicativamente: `npm run dev/build/lint`, `npm install`/`npm ci`, `git
 status/diff/add/commit/log`, lettura file. **Nessun** permesso pericoloso pre-approvato

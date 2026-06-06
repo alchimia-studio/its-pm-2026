@@ -14,26 +14,27 @@
 
 ## File coinvolti
 
-| File | Responsabilità |
-|------|----------------|
-| `package.json` | Dipendenze, script (`dev/build/lint/format`), `engines.node` |
-| `.nvmrc` | Versione Node per `nvm use` (22) |
-| `.prettierrc` | Configurazione Prettier (+ ordinamento classi Tailwind) |
-| `.gitignore` | Generato da Next; garantire `.DS_Store` |
-| `src/app/layout.tsx` | Layout root: `lang="it"`, metadata |
-| `src/app/page.tsx` | Landing placeholder con branding partner |
-| `src/app/globals.css` | Stili globali / Tailwind (lasciato come generato) |
-| `public/loghi/lga.jpg` · `public/loghi/confindustria.jpg` | Loghi partner |
-| `CLAUDE.md` | Guida operativa per Claude Code (italiano) |
-| `README.md` | Presentazione progetto + avvio (italiano) |
-| `DEPLOY.md` | Guida collegamento Vercel (italiano) |
-| `.claude/settings.json` | Allowlist permessi Claude Code |
+| File                                                      | Responsabilità                                               |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| `package.json`                                            | Dipendenze, script (`dev/build/lint/format`), `engines.node` |
+| `.nvmrc`                                                  | Versione Node per `nvm use` (22)                             |
+| `.prettierrc`                                             | Configurazione Prettier (+ ordinamento classi Tailwind)      |
+| `.gitignore`                                              | Generato da Next; garantire `.DS_Store`                      |
+| `src/app/layout.tsx`                                      | Layout root: `lang="it"`, metadata                           |
+| `src/app/page.tsx`                                        | Landing placeholder con branding partner                     |
+| `src/app/globals.css`                                     | Stili globali / Tailwind (lasciato come generato)            |
+| `public/loghi/lga.jpg` · `public/loghi/confindustria.jpg` | Loghi partner                                                |
+| `CLAUDE.md`                                               | Guida operativa per Claude Code (italiano)                   |
+| `README.md`                                               | Presentazione progetto + avvio (italiano)                    |
+| `DEPLOY.md`                                               | Guida collegamento Vercel (italiano)                         |
+| `.claude/settings.json`                                   | Allowlist permessi Claude Code                               |
 
 ---
 
 ## Task 1: Scaffold Next.js + configurazione di base
 
 **Files:**
+
 - Create: tutto l'output di `create-next-app` (in `.`), `.nvmrc`, `.prettierrc`
 - Modify: `package.json` (engines + script `format`), `.gitignore` (se manca `.DS_Store`)
 - Move: `images/*.jpg` → `public/loghi/`
@@ -43,6 +44,7 @@
 `create-next-app` rifiuta di partire se trova file/cartelle non riconosciuti (la cartella `images/` lo bloccherebbe). Li parcheggiamo in `/tmp` e li reintegriamo dopo.
 
 Run:
+
 ```bash
 cd /Users/markigno/workspace/projects/its-pm-2026
 mkdir -p /tmp/its-pm-logos
@@ -54,11 +56,13 @@ ls -la   # deve restare: .git, .DS_Store, docs (tutti accettati da create-next-a
 - [ ] **Step 2: Generare lo scaffold Next.js (non interattivo)**
 
 Run:
+
 ```bash
 npx --yes create-next-app@latest . \
   --ts --tailwind --eslint --app --src-dir \
   --import-alias "@/*" --use-npm --turbopack --yes
 ```
+
 Expected: termina con "Success! Created ..." e installa le dipendenze. Rileva il repo git esistente e NON reinizializza. Non tocca `docs/`.
 
 Se fallisce per la versione di Node (locale = 25): allineare con `nvm use 22` (lo `.nvmrc` non esiste ancora, quindi `nvm install 22 && nvm use 22`) e ripetere.
@@ -66,23 +70,28 @@ Se fallisce per la versione di Node (locale = 25): allineare con `nvm use 22` (l
 - [ ] **Step 3: Verificare lo scaffold**
 
 Run:
+
 ```bash
 ls src/app   # layout.tsx page.tsx globals.css favicon.ico
 cat package.json
 ```
+
 Expected: `package.json` con `name: "its-pm-2026"`, script `dev/build/start/lint`, dipendenze `next`, `react`, `react-dom`, `tailwindcss`.
 
 - [ ] **Step 4: Installare Prettier (+ plugin ordinamento classi Tailwind)**
 
 Run:
+
 ```bash
 npm install -D prettier prettier-plugin-tailwindcss
 ```
+
 Expected: aggiunte a `devDependencies`.
 
 - [ ] **Step 5: Creare `.prettierrc`**
 
 File: `.prettierrc`
+
 ```json
 {
   "plugins": ["prettier-plugin-tailwindcss"]
@@ -92,6 +101,7 @@ File: `.prettierrc`
 - [ ] **Step 6: Creare `.nvmrc`**
 
 File: `.nvmrc`
+
 ```
 22
 ```
@@ -99,6 +109,7 @@ File: `.nvmrc`
 - [ ] **Step 7: Aggiungere `engines` e lo script `format` in `package.json`**
 
 Modificare `package.json`: nel blocco `"scripts"` aggiungere la riga `format`, e aggiungere un blocco `"engines"` a livello root. Risultato atteso (le altre chiavi restano invariate):
+
 ```json
   "scripts": {
     "dev": "next dev --turbopack",
@@ -111,16 +122,20 @@ Modificare `package.json`: nel blocco `"scripts"` aggiungere la riga `format`, e
     "node": "22.x"
   }
 ```
-Nota: con Node 25 in locale, `npm` mostrerà solo un *warning* sull'engine (non bloccante). Vercel userà Node 22.
+
+Nota: con Node 25 in locale, `npm` mostrerà solo un _warning_ sull'engine (non bloccante). Vercel userà Node 22.
 
 - [ ] **Step 8: Garantire che `.DS_Store` sia in `.gitignore`**
 
 Leggere `.gitignore`. Il template di Next di norma include già `.DS_Store`. Se NON c'è, appendere:
+
 ```
 # macOS
 .DS_Store
 ```
+
 Verifica:
+
 ```bash
 grep -q ".DS_Store" .gitignore && echo "ok: .DS_Store ignorato"
 ```
@@ -128,6 +143,7 @@ grep -q ".DS_Store" .gitignore && echo "ok: .DS_Store ignorato"
 - [ ] **Step 9: Reintegrare i loghi in `public/loghi/`**
 
 Run:
+
 ```bash
 mkdir -p public/loghi
 mv /tmp/its-pm-logos/lga.jpg /tmp/its-pm-logos/confindustria.jpg public/loghi/
@@ -138,17 +154,21 @@ ls public/loghi   # confindustria.jpg lga.jpg
 - [ ] **Step 10: Verifica build (gate)**
 
 Run:
+
 ```bash
 npm run build
 ```
+
 Expected: "Compiled successfully" e la route `/` generata. Nessun errore.
 
 - [ ] **Step 11: Verifica lint (gate)**
 
 Run:
+
 ```bash
 npm run lint
 ```
+
 Expected: "No ESLint warnings or errors" (la pagina di default generata è già pulita).
 
 - [ ] **Step 12: Commit**
@@ -165,6 +185,7 @@ git commit -m "feat: scaffold Next.js e configurazione progetto" \
 ## Task 2: Landing placeholder + branding partner
 
 **Files:**
+
 - Modify: `src/app/layout.tsx` (sostituzione completa)
 - Modify: `src/app/page.tsx` (sostituzione completa)
 - Delete: SVG di default inutilizzati in `public/`
@@ -172,6 +193,7 @@ git commit -m "feat: scaffold Next.js e configurazione progetto" \
 - [ ] **Step 1: Sostituire `src/app/layout.tsx`**
 
 File: `src/app/layout.tsx` (contenuto completo)
+
 ```tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -213,6 +235,7 @@ export default function RootLayout({
 - [ ] **Step 2: Sostituire `src/app/page.tsx` con la landing**
 
 File: `src/app/page.tsx` (contenuto completo). Colori del brand LGA usati come valori arbitrari Tailwind (blu `#005ca9`, lime `#c0d11a`) — nessuna dipendenza dalla configurazione del tema. Loghi in card bianche (gestiscono lo sfondo bianco dei JPEG).
+
 ```tsx
 import Image from "next/image";
 
@@ -248,9 +271,10 @@ export default function Home() {
         </h1>
 
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-balance text-slate-600">
-          Un progetto reale, costruito passo dopo passo dagli studenti nel ruolo di
-          project manager con il supporto dell&apos;intelligenza artificiale.
-          L&apos;idea prende forma in classe: questa pagina crescerà insieme a noi.
+          Un progetto reale, costruito passo dopo passo dagli studenti nel ruolo
+          di project manager con il supporto dell&apos;intelligenza artificiale.
+          L&apos;idea prende forma in classe: questa pagina crescerà insieme a
+          noi.
         </p>
       </section>
 
@@ -305,6 +329,7 @@ export default function Home() {
 
 La pagina di default referenziava `public/*.svg`; la nostra landing non li usa.
 Run:
+
 ```bash
 rm -f public/next.svg public/vercel.svg public/file.svg public/globe.svg public/window.svg
 ```
@@ -312,26 +337,32 @@ rm -f public/next.svg public/vercel.svg public/file.svg public/globe.svg public/
 - [ ] **Step 4: Verifica lint (gate)**
 
 Run:
+
 ```bash
 npm run lint
 ```
+
 Expected: "No ESLint warnings or errors". (Le entità `&apos;`/`&amp;` evitano errori `react/no-unescaped-entities`; `h-auto`/`w-auto` su `next/image` evitano i warning sulle dimensioni.)
 
 - [ ] **Step 5: Verifica build (gate)**
 
 Run:
+
 ```bash
 npm run build
 ```
+
 Expected: "Compiled successfully", route `/` statica.
 
 - [ ] **Step 6: Verifica visiva**
 
 Avviare il dev server e controllare il rendering della landing + dei due loghi.
 Run:
+
 ```bash
 npm run dev
 ```
+
 Poi aprire `http://localhost:3000` e verificare: titolo, badge "In costruzione", i due loghi nelle card bianche, layout responsive. Catturare uno screenshot (skill `run` o Playwright). Fermare il server al termine.
 Expected: pagina renderizzata senza errori in console; loghi visibili e nitidi.
 
@@ -349,12 +380,14 @@ git commit -m "feat: landing placeholder con branding LGA e Confindustria" \
 ## Task 3: Documentazione e strumentazione Claude Code
 
 **Files:**
+
 - Create: `CLAUDE.md`, `DEPLOY.md`, `.claude/settings.json`
 - Modify: `README.md` (sostituzione del README di default)
 
 - [ ] **Step 1: Scrivere `CLAUDE.md`**
 
 File: `CLAUDE.md` (contenuto completo)
+
 ````markdown
 # CLAUDE.md — Guida per Claude Code
 
@@ -363,7 +396,7 @@ Questo file orienta Claude Code quando lavora su questo repository. Leggilo prim
 ## Cos'è questo progetto
 
 Repository di un **progetto pratico** del corso ITS **"Intelligenza Artificiale e strumenti
-generativi"** (percorso *Project & Innovation Manager*), promosso da **LGA — ITS Leading
+generativi"** (percorso _Project & Innovation Manager_), promosso da **LGA — ITS Leading
 Generation Academy** con **Confindustria Alto Milanese**.
 
 - Gli **studenti** (19-20 anni, senza competenze di programmazione) lavorano come **project
@@ -390,7 +423,7 @@ npm run format   # Prettier (formattazione del codice)
 ## Workflow e deploy
 
 - Il branch **`main`** è collegato a **Vercel**: **ogni push su `main` fa un deploy automatico in
-  produzione**; gli altri branch generano *preview deploy*.
+  produzione**; gli altri branch generano _preview deploy_.
 - Per questo **`main` deve sempre buildare**. Configurazione iniziale: vedi `DEPLOY.md`.
 
 ## Definition of done (prima di ogni commit)
@@ -423,11 +456,12 @@ docs/superpowers/    # spec e piani di progetto
 - [ ] **Step 2: Sostituire `README.md`**
 
 File: `README.md` (contenuto completo, sovrascrive quello di default)
+
 ````markdown
 # ITS PM 2026 — Progetto AI della classe
 
 Progetto pratico del corso ITS **"Intelligenza Artificiale e strumenti generativi"** (percorso
-*Project & Innovation Manager*), promosso da **LGA — ITS Leading Generation Academy** in
+_Project & Innovation Manager_), promosso da **LGA — ITS Leading Generation Academy** in
 collaborazione con **Confindustria Alto Milanese**.
 
 Gli studenti lavorano come **project manager** e definiscono il prodotto da realizzare; il docente
@@ -467,7 +501,8 @@ vedi **[DEPLOY.md](./DEPLOY.md)**.
 - [ ] **Step 3: Scrivere `DEPLOY.md`**
 
 File: `DEPLOY.md` (contenuto completo)
-````markdown
+
+```markdown
 # Deploy su Vercel
 
 Il progetto si pubblica da solo a ogni commit su `main`, una volta fatto **un collegamento
@@ -478,7 +513,7 @@ iniziale** tra il repository GitHub e Vercel. Si fa **una sola volta**, dal brow
 1. Vai su **[vercel.com](https://vercel.com)** e accedi (consigliato: login con GitHub).
 2. **Add New… → Project**.
 3. Importa il repository **`alchimia-studio/its-pm-2026`**.
-   - Se non compare, clicca *Adjust GitHub App Permissions* e dai a Vercel accesso al repo.
+   - Se non compare, clicca _Adjust GitHub App Permissions_ e dai a Vercel accesso al repo.
 4. Vercel riconosce automaticamente **Next.js**: lascia le impostazioni di default
    (Framework Preset: Next.js). Non serve alcun `vercel.json`.
 5. Clicca **Deploy** e attendi il primo build.
@@ -495,12 +530,13 @@ Fatto: ottieni un URL pubblico (es. `its-pm-2026.vercel.app`).
 
 - La versione di Node usata da Vercel è fissata a **22** tramite `engines` in `package.json` (e
   `.nvmrc`).
-- Per cambiare dominio o impostazioni: dashboard Vercel → progetto → *Settings*.
-````
+- Per cambiare dominio o impostazioni: dashboard Vercel → progetto → _Settings_.
+```
 
 - [ ] **Step 4: Scrivere `.claude/settings.json`**
 
 File: `.claude/settings.json` (allowlist di comandi sicuri e frequenti; il push NON è incluso, resta sotto conferma)
+
 ```json
 {
   "permissions": {
@@ -524,9 +560,11 @@ File: `.claude/settings.json` (allowlist di comandi sicuri e frequenti; il push 
 - [ ] **Step 5: Verifica validità JSON**
 
 Run:
+
 ```bash
 node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8')); console.log('settings.json valido')"
 ```
+
 Expected: "settings.json valido".
 
 - [ ] **Step 6: Commit**
@@ -547,10 +585,12 @@ git commit -m "docs: guida Claude Code, README, DEPLOY e permessi di progetto" \
 - [ ] **Step 1: Riepilogo locale**
 
 Run:
+
 ```bash
 git log --oneline
 git status
 ```
+
 Expected: 4 commit (spec + 3 di implementazione), working tree pulito.
 
 - [ ] **Step 2: Chiedere conferma per il push**
@@ -560,9 +600,11 @@ Il push pubblica sul remote ed è prerequisito per Vercel. **Chiedere esplicitam
 - [ ] **Step 3: Push (solo dopo OK)**
 
 Run:
+
 ```bash
 git push -u origin main
 ```
+
 Expected: branch `main` pubblicato su `origin`. (Usa le credenziali GitHub già configurate; se richiede autenticazione, è un'azione del docente.)
 
 - [ ] **Step 4: Collegamento Vercel**
@@ -573,6 +615,6 @@ Ricordare al docente i passi di `DEPLOY.md` (collegamento una tantum dal browser
 
 ## Self-Review (compilata)
 
-- **Spec coverage:** stack/Node/Prettier/gitignore/loghi → Task 1; landing+branding+next/image+palette → Task 2; CLAUDE.md/README/DEPLOY/settings → Task 3; Vercel zero-config (nessun `vercel.json`) → coperto in DEPLOY.md; commit locali + push gated → Task 4. Tutte le voci della *definition of done* dello spec sono mappate.
+- **Spec coverage:** stack/Node/Prettier/gitignore/loghi → Task 1; landing+branding+next/image+palette → Task 2; CLAUDE.md/README/DEPLOY/settings → Task 3; Vercel zero-config (nessun `vercel.json`) → coperto in DEPLOY.md; commit locali + push gated → Task 4. Tutte le voci della _definition of done_ dello spec sono mappate.
 - **Placeholder scan:** nessun TBD/TODO; contenuti dei file completi; hex dei colori concreti.
 - **Type consistency:** componenti `RootLayout` e `Home`; `alt` dei loghi coerenti tra page e descrizioni; percorsi `public/loghi/*.jpg` coerenti ovunque.

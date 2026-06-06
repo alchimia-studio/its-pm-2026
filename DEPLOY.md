@@ -8,7 +8,7 @@ iniziale** tra il repository GitHub e Vercel. Si fa **una sola volta**, dal brow
 1. Vai su **[vercel.com](https://vercel.com)** e accedi (consigliato: login con GitHub).
 2. **Add New… → Project**.
 3. Importa il repository **`alchimia-studio/its-pm-2026`**.
-   - Se non compare, clicca *Adjust GitHub App Permissions* e dai a Vercel accesso al repo.
+   - Se non compare, clicca _Adjust GitHub App Permissions_ e dai a Vercel accesso al repo.
 4. Vercel riconosce automaticamente **Next.js**: lascia le impostazioni di default
    (Framework Preset: Next.js). Non serve alcun `vercel.json`.
 5. Clicca **Deploy** e attendi il primo build.
@@ -25,4 +25,4 @@ Fatto: ottieni un URL pubblico (es. `its-pm-2026.vercel.app`).
 
 - La versione di Node usata da Vercel è fissata a **22** tramite `engines` in `package.json` (e
   `.nvmrc`).
-- Per cambiare dominio o impostazioni: dashboard Vercel → progetto → *Settings*.
+- Per cambiare dominio o impostazioni: dashboard Vercel → progetto → _Settings_.
