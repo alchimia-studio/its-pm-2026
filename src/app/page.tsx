@@ -1,17 +1,11 @@
 import Image from "next/image";
+import AnimatedBackground from "./AnimatedBackground";
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-between overflow-hidden bg-white px-6 py-10 text-slate-900">
-      {/* Accenti di sfondo nei colori del brand */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-gradient-to-b from-[#005ca9]/10 via-[#005ca9]/[0.03] to-transparent"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-[#c0d11a]/20 blur-3xl"
-      />
+    <main className="relative flex min-h-dvh flex-col items-center justify-between overflow-hidden px-6 py-10 text-slate-900">
+      {/* Sfondo animato nei colori del brand */}
+      <AnimatedBackground />
 
       {/* Eyebrow / corso */}
       <header className="w-full max-w-3xl pt-6 text-center">

@@ -17,3 +17,103 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* ---------------------------------------------------------------------------
+ * Sfondo animato della landing page
+ * Vedi il componente src/app/AnimatedBackground.tsx per il markup.
+ * Qui definiamo l'aspetto delle "macchie" sfumate, la griglia, la
+ * vignettatura e i movimenti lenti (keyframes).
+ * ------------------------------------------------------------------------- */
+
+/* Macchia sfumata di base: un cerchio molto morbido e semitrasparente. */
+.bg-orb {
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+/* Colori delle macchie, presi dalla palette del brand. */
+.bg-orb--blue {
+  background: radial-gradient(circle at center, #005ca9 0%, transparent 70%);
+}
+.bg-orb--lime {
+  background: radial-gradient(circle at center, #c0d11a 0%, transparent 70%);
+  opacity: 0.45;
+}
+.bg-orb--sky {
+  background: radial-gradient(circle at center, #3b9ae1 0%, transparent 70%);
+  opacity: 0.4;
+}
+
+/* Griglia leggerissima: linee blu molto trasparenti, sfumate verso il basso. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 92, 169, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 92, 169, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
+}
+
+/* Vignettatura bianca: schiarisce i bordi e tiene il centro pulito. */
+.bg-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 55%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+}
+
+/* Movimenti lenti e ampi: ogni macchia ha una sua "deriva" diversa, così
+ * l'insieme non sembra mai ripetersi in modo evidente. */
+@keyframes orb-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(8rem, 5rem) scale(1.15);
+  }
+}
+
+@keyframes orb-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-7rem, 6rem) scale(0.9);
+  }
+}
+
+@keyframes orb-3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(5rem, -6rem) scale(1.1);
+  }
+}
+
+/* Classi di utilità per agganciare le animazioni (usate con motion-safe:). */
+.animate-orb-1 {
+  animation: orb-1 22s ease-in-out infinite;
+}
+.animate-orb-2 {
+  animation: orb-2 26s ease-in-out infinite;
+}
+.animate-orb-3 {
+  animation: orb-3 30s ease-in-out infinite;
+}
+
+/* Accessibilità: se l'utente preferisce meno movimento, fermiamo tutto. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-orb-1,
+  .animate-orb-2,
+  .animate-orb-3 {
+    animation: none;
+  }
+}
