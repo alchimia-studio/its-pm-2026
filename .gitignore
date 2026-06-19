@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# companion visivo del brainstorming (Superpowers)
+.superpowers/
+.playwright-mcp/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
