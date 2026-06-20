@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import AnimatedBackground from "./AnimatedBackground";
 
 export default function Home() {
@@ -33,6 +34,13 @@ export default function Home() {
           supporto dell&apos;intelligenza artificiale. L&apos;idea prende forma
           in classe: questa pagina crescerà insieme a noi.
         </p>
+
+        <Link
+          href="/gioco"
+          className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#005ca9] px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-[#0a4f8a]"
+        >
+          🎮 Gioca: Duello tra Cannoni
+        </Link>
       </section>
 
       {/* Partner / branding */}
