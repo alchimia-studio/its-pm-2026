@@ -28,6 +28,9 @@
 .superpowers/
 .playwright-mcp/
 
+# impostazioni locali di Claude Code (personali, non condivise)
+.claude/settings.local.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*
