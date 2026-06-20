@@ -41,12 +41,12 @@ export default function GameCanvas() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       setPortrait(h > w);
 
-      if (!stateRef.current) {
+      const s = stateRef.current;
+      if (!s || s.width !== w || s.height !== h) {
+        // Al primo avvio e a ogni ridimensionamento reale (es. rotazione del
+        // dispositivo) rigeneriamo il campo: così cannoni e terreno restano
+        // sempre coerenti con la finestra e non finiscono mai fuori schermo.
         stateRef.current = createGame(w, h);
-      } else {
-        // Adatta le dimensioni; il campo viene rigenerato dalla partita successiva.
-        stateRef.current.width = w;
-        stateRef.current.height = h;
       }
     }
 

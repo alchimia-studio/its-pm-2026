@@ -111,9 +111,14 @@ export function releaseAim(state: GameState): void {
   const { vx, vy } = launchVelocity(aim.power, aim.angle);
   const dirX = Math.cos(aim.angle);
   const dirY = Math.sin(aim.angle);
+  const spawnX = cannon.x + dirX * MUZZLE;
+  // La palla esce dalla bocca della canna, ma mai sotto il terreno: così un
+  // tiro orizzontale o in discesa non viene annullato già al primo istante.
+  const maxSpawnY = heightAt(state.terrain, spawnX) - BALL_RADIUS - 1;
+  const spawnY = Math.min(cannon.y + dirY * MUZZLE, maxSpawnY);
   state.ball = {
-    x: cannon.x + dirX * MUZZLE,
-    y: cannon.y + dirY * MUZZLE,
+    x: spawnX,
+    y: spawnY,
     vx,
     vy,
     active: true,
