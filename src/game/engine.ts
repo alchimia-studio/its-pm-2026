@@ -3,16 +3,23 @@
 // mira, tiro, collisioni, danni, passaggio del turno e vittoria.
 // Per semplicità e prestazioni lo stato viene modificato sul posto (in place).
 
-import type { AimState, Ball, GameState, PlayerId } from "./types";
+import {
+  type AimState,
+  type Ball,
+  type GameState,
+  type PlayerId,
+  BALL_RADIUS,
+  CANNON_RADIUS,
+} from "./types";
 import { flattenPlatform, generateTerrain, heightAt } from "./terrain";
 import { launchVelocity, stepBall } from "./physics";
 import { canStartAim, computeAim, isShotValid, maxDragFor } from "./input";
 
-export const BALL_RADIUS = 6;
-export const CANNON_HIT_RADIUS = 26; // sagoma-bersaglio generosa
+export { BALL_RADIUS } from "./types";
+export const CANNON_HIT_RADIUS = 42; // sagoma-bersaglio generosa (cannone grande)
 export const DAMAGE = 20;
-const PLATFORM_HALF = 28; // semi-larghezza della piattaforma sotto il cannone
-const MUZZLE = 30; // distanza dalla quale esce la palla (oltre la base del cannone)
+const PLATFORM_HALF = 34; // semi-larghezza della piattaforma sotto il cannone
+const MUZZLE = 60; // distanza dalla quale esce la palla (oltre la canna del cannone)
 
 function emptyAim(): AimState {
   return {
@@ -42,13 +49,16 @@ export function createGame(
 ): GameState {
   const terrain = generateTerrain({ width, height, rng });
 
-  // Margini laterali sorteggiati (6%..16% della larghezza): fanno variare la distanza.
-  const leftMargin = width * (0.06 + rng() * 0.1);
-  const rightMargin = width * (0.06 + rng() * 0.1);
-  const redX = leftMargin;
-  const blueX = width - rightMargin;
-  const redY = flattenPlatform(terrain, redX, PLATFORM_HALF);
-  const blueY = flattenPlatform(terrain, blueX, PLATFORM_HALF);
+  // Cannoni simmetrici: stessa distanza dal centro (margine uguale ai due lati).
+  // Il margine è sorteggiato una volta sola per dare varietà tra una partita e
+  // l'altra, ma resta identico a destra e a sinistra.
+  const ri = Math.round(width * (0.08 + rng() * 0.06)); // 8%–14% della larghezza
+  const redX = ri;
+  const blueX = width - 1 - ri;
+  // Il terreno è simmetrico, quindi i due cannoni risultano alla stessa altezza.
+  // Si solleva il corpo del cannone sopra il suolo (così non sembra interrato).
+  const redY = flattenPlatform(terrain, redX, PLATFORM_HALF) - CANNON_RADIUS;
+  const blueY = flattenPlatform(terrain, blueX, PLATFORM_HALF) - CANNON_RADIUS;
 
   const first: PlayerId = rng() < 0.5 ? "red" : "blue";
 

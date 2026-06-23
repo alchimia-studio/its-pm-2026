@@ -2,6 +2,10 @@
 // Tipi condivisi da tutto il gioco. Le coordinate sono in "pixel logici"
 // (la stessa unità usata per disegnare): origine in alto a sinistra, y verso il basso.
 
+// Dimensioni geometriche condivise tra disegno e fisica (in pixel del campo).
+export const CANNON_RADIUS = 28; // raggio del corpo del cannone
+export const BALL_RADIUS = 9; // raggio della palla
+
 export type PlayerId = "red" | "blue";
 
 /** Un cannone appoggiato sul terreno. */

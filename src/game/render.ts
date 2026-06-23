@@ -2,7 +2,7 @@
 // Disegna l'intero stato di gioco sul canvas, in stile retro neon.
 // Riceve un contesto 2D già scalato (coordinate in pixel logici).
 
-import type { GameState, PlayerId } from "./types";
+import { type GameState, type PlayerId, BALL_RADIUS, CANNON_RADIUS } from "./types";
 import { heightAt } from "./terrain";
 
 const COLORS = {
@@ -116,27 +116,27 @@ function drawCannon(ctx: CanvasRenderingContext2D, s: GameState, id: PlayerId): 
   ctx.save();
   ctx.translate(c.x, c.y);
   ctx.shadowColor = color;
-  ctx.shadowBlur = 18;
+  ctx.shadowBlur = 24;
 
   // Canna (ruota con l'angolo di mira).
   ctx.save();
   ctx.rotate(c.angle);
   ctx.fillStyle = color;
-  roundRect(ctx, -6, -7, 34, 14, 7);
+  roundRect(ctx, -12, -14, 68, 28, 14);
   ctx.fill();
   ctx.restore();
 
-  // Base.
+  // Corpo del cannone.
   ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.arc(0, 0, 14, 0, Math.PI * 2);
+  ctx.arc(0, 0, CANNON_RADIUS, 0, Math.PI * 2);
   ctx.fill();
 
   // Foro centrale (senza bagliore).
   ctx.shadowBlur = 0;
   ctx.fillStyle = COLORS.skyTop;
   ctx.beginPath();
-  ctx.arc(0, 0, 7, 0, Math.PI * 2);
+  ctx.arc(0, 0, CANNON_RADIUS / 2, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -148,7 +148,7 @@ function drawBall(ctx: CanvasRenderingContext2D, s: GameState): void {
   ctx.shadowBlur = 16;
   ctx.fillStyle = COLORS.ball;
   ctx.beginPath();
-  ctx.arc(b.x, b.y, 6, 0, Math.PI * 2);
+  ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -190,7 +190,7 @@ function drawAim(ctx: CanvasRenderingContext2D, s: GameState): void {
   ctx.fillStyle = COLORS.text;
   ctx.font = "bold 14px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(`${Math.round(a.power * 100)}%`, c.x, c.y - 28);
+  ctx.fillText(`${Math.round(a.power * 100)}%`, c.x, c.y - CANNON_RADIUS - 16);
   ctx.restore();
 }
 

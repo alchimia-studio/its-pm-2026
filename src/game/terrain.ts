@@ -15,31 +15,54 @@ function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v));
 }
 
-/** Crea il profilo del terreno sommando alcune onde sinusoidali casuali. */
+function clamp01(v: number): number {
+  return Math.max(0, Math.min(1, v));
+}
+
+/** Transizione morbida 0→1 (per smorzare il terreno verso i bordi). */
+function smoothstep(t: number): number {
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Crea il profilo del terreno: colline casuali al centro, **simmetrico rispetto
+ * alla metà dello schermo** (a specchio) e **piatto vicino ai bordi**, così i due
+ * cannoni partono alla stessa altezza, senza montagne addosso, e con pari difficoltà.
+ */
 export function generateTerrain({
   width,
   height,
   rng = Math.random,
 }: TerrainOptions): Terrain {
   // Banda verticale in cui può stare il suolo (y piccola = in alto).
-  const minTop = height * 0.45; // suolo più alto possibile
-  const maxTop = height * 0.85; // suolo più basso possibile
+  const minTop = height * 0.42; // suolo più alto possibile (colline centrali)
+  const maxTop = height * 0.82; // suolo più basso possibile
   const mid = (minTop + maxTop) / 2;
   const amp = (maxTop - minTop) / 2;
+  const baseY = height * 0.74; // quota piatta del suolo vicino ai cannoni
 
-  // Tre onde con frequenza, fase e ampiezza decrescenti.
+  // Tre onde con frequenza, fase e ampiezza decrescenti (le colline centrali).
   const waves = [0, 1, 2].map((i) => ({
     freq: ((1 + i + rng() * 1.5) * (Math.PI * 2)) / width,
     phase: rng() * Math.PI * 2,
     amp: amp * (0.6 - i * 0.15),
   }));
 
+  // Larghezza della fascia (vicino a ogni bordo) resa piatta.
+  const edge = width * 0.3;
+
   const surface: number[] = new Array(width);
-  for (let x = 0; x < width; x++) {
-    let y = mid;
-    for (const w of waves) y += Math.sin(x * w.freq + w.phase) * w.amp;
-    surface[x] = clamp(y, minTop, maxTop);
+  const halfN = Math.ceil(width / 2);
+  for (let x = 0; x < halfN; x++) {
+    let raw = mid;
+    for (const w of waves) raw += Math.sin(x * w.freq + w.phase) * w.amp;
+    raw = clamp(raw, minTop, maxTop);
+    // Vicino al bordo (x→0) il terreno tende alla quota piatta baseY.
+    const k = smoothstep(clamp01(x / edge));
+    surface[x] = baseY + (raw - baseY) * k;
   }
+  // Specchia la metà sinistra sulla destra: terreno simmetrico al centro.
+  for (let x = 0; x < halfN; x++) surface[width - 1 - x] = surface[x];
 
   return { width, height, surface };
 }
