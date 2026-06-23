@@ -6,7 +6,7 @@
 import type { AimState, Ball, GameState, PlayerId } from "./types";
 import { flattenPlatform, generateTerrain, heightAt } from "./terrain";
 import { launchVelocity, stepBall } from "./physics";
-import { canStartAim, computeAim, isShotValid } from "./input";
+import { canStartAim, computeAim, isShotValid, maxDragFor } from "./input";
 
 export const BALL_RADIUS = 6;
 export const CANNON_HIT_RADIUS = 26; // sagoma-bersaglio generosa
@@ -55,6 +55,7 @@ export function createGame(
   return {
     width,
     height,
+    maxDrag: maxDragFor(width, height),
     phase: "title",
     current: first,
     winner: null,
@@ -84,14 +85,14 @@ export function beginAim(state: GameState, px: number, py: number): void {
   if (state.phase !== "aiming") return;
   const cannon = state.cannons[state.current];
   if (!canStartAim(cannon, px, py)) return;
-  state.aim = computeAim(cannon, px, py);
+  state.aim = computeAim(cannon, px, py, state.maxDrag);
 }
 
 /** Aggiorna la mira durante il trascinamento; la canna segue la direzione di tiro. */
 export function updateAim(state: GameState, px: number, py: number): void {
   if (!state.aim.active) return;
   const cannon = state.cannons[state.current];
-  state.aim = computeAim(cannon, px, py);
+  state.aim = computeAim(cannon, px, py, state.maxDrag);
   cannon.angle = state.aim.angle;
 }
 

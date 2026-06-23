@@ -47,6 +47,7 @@ export interface AimState {
 export interface GameState {
   width: number;
   height: number;
+  maxDrag: number; // lunghezza di trascinamento che dà la potenza massima
   phase: Phase;
   current: PlayerId; // di chi è il turno
   winner: PlayerId | null;

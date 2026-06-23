@@ -16,12 +16,22 @@ import { draw } from "@/game/render";
 
 const STEP = 1 / 60; // passo di simulazione a tempo fisso (secondi)
 
+// Il gioco vive in un "mondo" di dimensione fissa (16:9) che poi viene scalato
+// per riempire la finestra: così il campo resta identico su ogni schermo e non
+// cambia mai quando si ridimensiona la finestra.
+const WORLD_W = 1280;
+const WORLD_H = 720;
+const SAFE_AREA = 0.94; // piccolo bordo attorno al campo (spazio per la fionda)
+const BAR_COLOR = "#0a0e24"; // colore delle bande: uguale al cielo
+
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameState | null>(null);
+  // Come il mondo è posizionato dentro la finestra (per disegno e input).
+  const viewRef = useRef({ dpr: 1, scale: 1, offX: 0, offY: 0 });
   const [portrait, setPortrait] = useState(false);
 
-  // Ciclo di animazione + ridimensionamento.
+  // Ciclo di animazione + adattamento della finestra (letterbox).
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
@@ -30,24 +40,28 @@ export default function GameCanvas() {
     let last = 0;
     let acc = 0;
 
+    // Il campo si crea una sola volta: il ridimensionamento non lo rigenera.
+    if (!stateRef.current) stateRef.current = createGame(WORLD_W, WORLD_H);
+
     function fit() {
       const dpr = window.devicePixelRatio || 1;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      setPortrait(h > w);
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+      canvas.width = Math.round(winW * dpr);
+      canvas.height = Math.round(winH * dpr);
+      canvas.style.width = `${winW}px`;
+      canvas.style.height = `${winH}px`;
+      setPortrait(winH > winW);
 
-      const s = stateRef.current;
-      if (!s || s.width !== w || s.height !== h) {
-        // Al primo avvio e a ogni ridimensionamento reale (es. rotazione del
-        // dispositivo) rigeneriamo il campo: così cannoni e terreno restano
-        // sempre coerenti con la finestra e non finiscono mai fuori schermo.
-        stateRef.current = createGame(w, h);
-      }
+      // Scala il mondo per riempire la finestra mantenendo le proporzioni, con
+      // un piccolo bordo di sicurezza. Il terreno NON viene mai rigenerato.
+      const scale = Math.min(winW / WORLD_W, winH / WORLD_H) * SAFE_AREA;
+      viewRef.current = {
+        dpr,
+        scale,
+        offX: (winW - WORLD_W * scale) / 2,
+        offY: (winH - WORLD_H * scale) / 2,
+      };
     }
 
     function frame(t: number) {
@@ -63,6 +77,20 @@ export default function GameCanvas() {
           update(s, STEP);
           acc -= STEP;
         }
+        const v = viewRef.current;
+        // Riempie tutta la finestra con il colore del cielo (le bande laterali).
+        ctx.setTransform(v.dpr, 0, 0, v.dpr, 0, 0);
+        ctx.fillStyle = BAR_COLOR;
+        ctx.fillRect(0, 0, canvas.width / v.dpr, canvas.height / v.dpr);
+        // Disegna il mondo centrato e scalato dentro la finestra.
+        ctx.setTransform(
+          v.dpr * v.scale,
+          0,
+          0,
+          v.dpr * v.scale,
+          v.dpr * v.offX,
+          v.dpr * v.offY,
+        );
         draw(ctx, s);
       }
       raf = requestAnimationFrame(frame);
@@ -85,7 +113,12 @@ export default function GameCanvas() {
 
     function pos(e: PointerEvent) {
       const r = canvas!.getBoundingClientRect();
-      return { x: e.clientX - r.left, y: e.clientY - r.top };
+      const v = viewRef.current;
+      // Da pixel della finestra a coordinate del mondo (annulla scala e bande).
+      return {
+        x: (e.clientX - r.left - v.offX) / v.scale,
+        y: (e.clientY - r.top - v.offY) / v.scale,
+      };
     }
 
     function down(e: PointerEvent) {
