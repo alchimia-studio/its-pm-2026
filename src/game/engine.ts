@@ -8,11 +8,12 @@ import {
   type Ball,
   type GameState,
   type PlayerId,
+  type Wind,
   BALL_RADIUS,
   CANNON_RADIUS,
 } from "./types";
 import { flattenPlatform, generateTerrain, heightAt } from "./terrain";
-import { launchVelocity, stepBall } from "./physics";
+import { launchVelocity, stepBall, windAccelFor } from "./physics";
 import { canStartAim, computeAim, isShotValid, maxDragFor } from "./input";
 
 export { BALL_RADIUS } from "./types";
@@ -35,6 +36,10 @@ function emptyAim(): AimState {
 
 function emptyBall(): Ball {
   return { x: 0, y: 0, vx: 0, vy: 0, active: false };
+}
+
+function randomWind(rng: () => number): Wind {
+  return { dirX: rng() < 0.5 ? -1 : 1, strength: rng() };
 }
 
 function other(p: PlayerId): PlayerId {
@@ -66,6 +71,8 @@ export function createGame(
     width,
     height,
     maxDrag: maxDragFor(width, height),
+    wind: randomWind(rng),
+    shotsSinceWindChange: 0,
     phase: "title",
     current: first,
     winner: null,
@@ -140,7 +147,7 @@ export function releaseAim(state: GameState): void {
 /** Avanza la simulazione di un passo dt (secondi). Va chiamata solo in volo. */
 export function update(state: GameState, dt: number): void {
   if (state.phase !== "flying" || !state.ball.active) return;
-  state.ball = stepBall(state.ball, dt);
+  state.ball = stepBall(state.ball, dt, windAccelFor(state.wind));
   resolveBall(state);
 }
 
@@ -178,6 +185,13 @@ function endShot(state: GameState, hit: boolean, enemyId: PlayerId): void {
       state.winner = state.current;
       return;
     }
+  }
+
+  // Vento: cambia ogni 2 tiri conclusi (un round completo di entrambi i giocatori).
+  state.shotsSinceWindChange += 1;
+  if (state.shotsSinceWindChange >= 2) {
+    state.wind = randomWind(Math.random);
+    state.shotsSinceWindChange = 0;
   }
 
   // Passa il turno.

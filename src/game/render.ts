@@ -194,6 +194,44 @@ function drawAim(ctx: CanvasRenderingContext2D, s: GameState): void {
   ctx.restore();
 }
 
+function drawWind(ctx: CanvasRenderingContext2D, s: GameState): void {
+  const w = s.wind;
+  const angle = w.dirX > 0 ? 0 : Math.PI;
+  const cx = s.width / 2;
+  const y = 54;
+  const len = 20 + w.strength * 50;
+  const tipX = cx + Math.cos(angle) * len;
+
+  ctx.save();
+  ctx.strokeStyle = COLORS.subtitle;
+  ctx.fillStyle = COLORS.subtitle;
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+
+  ctx.beginPath();
+  ctx.moveTo(cx - Math.cos(angle) * len, y);
+  ctx.lineTo(tipX, y);
+  ctx.stroke();
+
+  const ah = 7;
+  const left = angle + Math.PI - 0.5;
+  const right = angle + Math.PI + 0.5;
+  ctx.beginPath();
+  ctx.moveTo(tipX, y);
+  ctx.lineTo(tipX + Math.cos(left) * ah, y + Math.sin(left) * ah);
+  ctx.lineTo(tipX + Math.cos(right) * ah, y + Math.sin(right) * ah);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.fillStyle = COLORS.subtitle;
+  ctx.textAlign = "center";
+  ctx.fillText(`vento ${Math.round(w.strength * 100)}%`, cx, y + 18);
+  ctx.restore();
+}
+
 function drawHud(ctx: CanvasRenderingContext2D, s: GameState): void {
   drawHealth(ctx, 20, 20, s.cannons.red.health, COLORS.red, "ROSSO", "left");
   drawHealth(ctx, s.width - 20, 20, s.cannons.blue.health, COLORS.blue, "BLU", "right");
@@ -207,6 +245,8 @@ function drawHud(ctx: CanvasRenderingContext2D, s: GameState): void {
     ctx.fillText(`Turno: ${name}`, s.width / 2, 30);
     ctx.restore();
   }
+
+  if (s.phase === "aiming" || s.phase === "flying") drawWind(ctx, s);
 }
 
 function drawHealth(

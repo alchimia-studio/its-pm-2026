@@ -47,11 +47,19 @@ export interface AimState {
   angle: number; // direzione di tiro (radianti)
 }
 
+/** Il vento: spinge la palla in orizzontale mentre è in volo. */
+export interface Wind {
+  dirX: -1 | 1; // verso: -1 sinistra, 1 destra
+  strength: number; // 0..1, quanto è forte
+}
+
 /** Lo stato completo della partita. */
 export interface GameState {
   width: number;
   height: number;
   maxDrag: number; // lunghezza di trascinamento che dà la potenza massima
+  wind: Wind;
+  shotsSinceWindChange: number; // tiri conclusi col vento attuale (0 o 1); a 2 si ri-sorteggia
   phase: Phase;
   current: PlayerId; // di chi è il turno
   winner: PlayerId | null;
