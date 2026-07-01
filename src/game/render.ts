@@ -2,15 +2,19 @@
 // Disegna l'intero stato di gioco sul canvas, in stile retro neon.
 // Riceve un contesto 2D già scalato (coordinate in pixel logici).
 
-import { type GameState, type PlayerId, BALL_RADIUS, CANNON_RADIUS } from "./types";
+import {
+  type Biome,
+  type GameState,
+  type PlayerId,
+  BALL_RADIUS,
+  CANNON_RADIUS,
+} from "./types";
 import { heightAt } from "./terrain";
 
 const COLORS = {
   skyTop: "#0a0e24",
   skyBottom: "#141a3a",
   star: "#ffffff",
-  terrain: "#1c8f5a",
-  terrainEdge: "#27e0a0",
   red: "#ff3b6b",
   blue: "#3d6bff",
   ball: "#fff2a8",
@@ -18,6 +22,13 @@ const COLORS = {
   text: "#ffffff",
   subtitle: "#cfd6ff",
 } as const;
+
+const BIOME_PALETTE: Record<Biome, { fill: string; edge: string }> = {
+  erba: { fill: "#1c8f5a", edge: "#27e0a0" },
+  sabbia: { fill: "#c98a3a", edge: "#f2c66d" },
+  neve: { fill: "#dfe9f2", edge: "#ffffff" },
+  spiaggia: { fill: "#e8d9b5", edge: "#2fd7c4" },
+};
 
 const BLOCK = 14; // larghezza dei blocchi del terreno (look "pixel")
 const STEP = 10; // quantizzazione verticale del terreno
@@ -100,12 +111,13 @@ export function draw(ctx: CanvasRenderingContext2D, s: GameState): void {
 
 function drawTerrain(ctx: CanvasRenderingContext2D, s: GameState): void {
   const t = s.terrain;
+  const palette = BIOME_PALETTE[s.biome];
   for (let x = 0; x < t.width; x += BLOCK) {
     const cx = Math.min(x + BLOCK / 2, t.width - 1);
     const top = Math.floor(heightAt(t, cx) / STEP) * STEP;
-    ctx.fillStyle = COLORS.terrain;
+    ctx.fillStyle = palette.fill;
     ctx.fillRect(x, top, BLOCK, s.height - top);
-    ctx.fillStyle = COLORS.terrainEdge;
+    ctx.fillStyle = palette.edge;
     ctx.fillRect(x, top, BLOCK, 4);
   }
 }

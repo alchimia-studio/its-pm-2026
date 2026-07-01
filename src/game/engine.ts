@@ -6,6 +6,7 @@
 import {
   type AimState,
   type Ball,
+  type Biome,
   type GameState,
   type PlayerId,
   type Wind,
@@ -42,6 +43,12 @@ function randomWind(rng: () => number): Wind {
   return { dirX: rng() < 0.5 ? -1 : 1, strength: rng() };
 }
 
+const BIOMES: Biome[] = ["erba", "sabbia", "neve", "spiaggia"];
+
+function randomBiome(rng: () => number): Biome {
+  return BIOMES[Math.floor(rng() * BIOMES.length)];
+}
+
 function other(p: PlayerId): PlayerId {
   return p === "red" ? "blue" : "red";
 }
@@ -73,6 +80,7 @@ export function createGame(
     maxDrag: maxDragFor(width, height),
     wind: randomWind(rng),
     shotsSinceWindChange: 0,
+    biome: randomBiome(rng),
     phase: "title",
     current: first,
     winner: null,
