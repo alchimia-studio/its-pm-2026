@@ -5,6 +5,8 @@
 // Dimensioni geometriche condivise tra disegno e fisica (in pixel del campo).
 export const CANNON_RADIUS = 28; // raggio del corpo del cannone
 export const BALL_RADIUS = 9; // raggio della palla
+export const TARGET_RADIUS = 16; // raggio del bersaglio power-up nel cielo
+export const POWER_SIZE_MULTIPLIER = 2; // ingrandimento (disegno e sagoma) di un cannone in modalità power
 
 export type PlayerId = "red" | "blue";
 
@@ -56,6 +58,17 @@ export interface Wind {
 /** I quattro biomi: cambiano solo la tavolozza colori del terreno. */
 export type Biome = "erba" | "sabbia" | "neve" | "spiaggia";
 
+/** Bersaglio power-up nel cielo. */
+export interface PowerTarget {
+  active: boolean;
+  x: number;
+  y: number;
+  shotsLeft: number; // tiri residui prima che scompaia se non colpito
+}
+
+/** Turni di modalità power residui per ciascun cannone (0 = non attiva). */
+export type PowerTurns = Record<PlayerId, number>;
+
 /** Lo stato completo della partita. */
 export interface GameState {
   width: number;
@@ -64,6 +77,8 @@ export interface GameState {
   wind: Wind;
   shotsSinceWindChange: number; // tiri conclusi col vento attuale (0 o 1); a 2 si ri-sorteggia
   biome: Biome;
+  target: PowerTarget;
+  power: PowerTurns;
   phase: Phase;
   current: PlayerId; // di chi è il turno
   winner: PlayerId | null;

@@ -8,6 +8,8 @@ import {
   type PlayerId,
   BALL_RADIUS,
   CANNON_RADIUS,
+  POWER_SIZE_MULTIPLIER,
+  TARGET_RADIUS,
 } from "./types";
 import { heightAt } from "./terrain";
 
@@ -95,6 +97,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: GameState): void {
   ctx.globalAlpha = 1;
 
   drawTerrain(ctx, s);
+  drawTarget(ctx, s);
   drawCannon(ctx, s, "red");
   drawCannon(ctx, s, "blue");
   if (s.phase === "flying" && s.ball.active) drawBall(ctx, s);
@@ -122,17 +125,53 @@ function drawTerrain(ctx: CanvasRenderingContext2D, s: GameState): void {
   }
 }
 
+function drawTarget(ctx: CanvasRenderingContext2D, s: GameState): void {
+  if (!s.target.active) return;
+  const t = s.target;
+  ctx.save();
+  ctx.translate(t.x, t.y);
+  ctx.shadowColor = COLORS.arrow;
+  ctx.shadowBlur = 20;
+  ctx.fillStyle = COLORS.arrow;
+  ctx.beginPath();
+  ctx.arc(0, 0, TARGET_RADIUS, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = COLORS.skyTop;
+  ctx.beginPath();
+  ctx.arc(0, 0, TARGET_RADIUS / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawCannon(ctx: CanvasRenderingContext2D, s: GameState, id: PlayerId): void {
   const c = s.cannons[id];
   const color = playerColor(id);
+  const powered = s.power[id] > 0;
+  const scale = powered ? POWER_SIZE_MULTIPLIER : 1;
   ctx.save();
   ctx.translate(c.x, c.y);
+
+  if (powered) {
+    // Aura di modalità power: un alone più ampio e più luminoso attorno al cannone.
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 40;
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(0, 0, CANNON_RADIUS * scale * 1.35, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   ctx.shadowColor = color;
   ctx.shadowBlur = 24;
 
   // Canna (ruota con l'angolo di mira).
   ctx.save();
   ctx.rotate(c.angle);
+  ctx.scale(scale, scale);
   ctx.fillStyle = color;
   roundRect(ctx, -12, -14, 68, 28, 14);
   ctx.fill();
@@ -141,14 +180,14 @@ function drawCannon(ctx: CanvasRenderingContext2D, s: GameState, id: PlayerId): 
   // Corpo del cannone.
   ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.arc(0, 0, CANNON_RADIUS, 0, Math.PI * 2);
+  ctx.arc(0, 0, CANNON_RADIUS * scale, 0, Math.PI * 2);
   ctx.fill();
 
   // Foro centrale (senza bagliore).
   ctx.shadowBlur = 0;
   ctx.fillStyle = COLORS.skyTop;
   ctx.beginPath();
-  ctx.arc(0, 0, CANNON_RADIUS / 2, 0, Math.PI * 2);
+  ctx.arc(0, 0, (CANNON_RADIUS * scale) / 2, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -168,6 +207,7 @@ function drawBall(ctx: CanvasRenderingContext2D, s: GameState): void {
 function drawAim(ctx: CanvasRenderingContext2D, s: GameState): void {
   const a = s.aim;
   const c = s.cannons[s.current];
+  const scale = s.power[s.current] > 0 ? POWER_SIZE_MULTIPLIER : 1;
   const len = 40 + a.power * 90; // lunghezza della freccia in base alla potenza
   const tipX = c.x + Math.cos(a.angle) * len;
   const tipY = c.y + Math.sin(a.angle) * len;
@@ -202,7 +242,7 @@ function drawAim(ctx: CanvasRenderingContext2D, s: GameState): void {
   ctx.fillStyle = COLORS.text;
   ctx.font = "bold 14px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(`${Math.round(a.power * 100)}%`, c.x, c.y - CANNON_RADIUS - 16);
+  ctx.fillText(`${Math.round(a.power * 100)}%`, c.x, c.y - CANNON_RADIUS * scale - 16);
   ctx.restore();
 }
 
@@ -245,8 +285,17 @@ function drawWind(ctx: CanvasRenderingContext2D, s: GameState): void {
 }
 
 function drawHud(ctx: CanvasRenderingContext2D, s: GameState): void {
-  drawHealth(ctx, 20, 20, s.cannons.red.health, COLORS.red, "ROSSO", "left");
-  drawHealth(ctx, s.width - 20, 20, s.cannons.blue.health, COLORS.blue, "BLU", "right");
+  drawHealth(ctx, 20, 20, s.cannons.red.health, COLORS.red, "ROSSO", "left", s.power.red);
+  drawHealth(
+    ctx,
+    s.width - 20,
+    20,
+    s.cannons.blue.health,
+    COLORS.blue,
+    "BLU",
+    "right",
+    s.power.blue,
+  );
 
   if (s.phase === "aiming") {
     const name = s.current === "red" ? "ROSSO" : "BLU";
@@ -269,6 +318,7 @@ function drawHealth(
   color: string,
   label: string,
   align: "left" | "right",
+  powerTurns: number,
 ): void {
   const w = 160;
   const h = 16;
@@ -290,7 +340,8 @@ function drawHealth(
   ctx.fillStyle = COLORS.text;
   ctx.font = "bold 12px system-ui, sans-serif";
   ctx.textAlign = align;
-  ctx.fillText(`${label} ${hp}%`, align === "left" ? bx : bx + w, y + h + 14);
+  const suffix = powerTurns > 0 ? ` ⚡×${powerTurns}` : "";
+  ctx.fillText(`${label} ${hp}%${suffix}`, align === "left" ? bx : bx + w, y + h + 14);
   ctx.restore();
 }
 

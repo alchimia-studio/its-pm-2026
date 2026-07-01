@@ -9,9 +9,12 @@ import {
   type Biome,
   type GameState,
   type PlayerId,
+  type PowerTarget,
   type Wind,
   BALL_RADIUS,
   CANNON_RADIUS,
+  POWER_SIZE_MULTIPLIER,
+  TARGET_RADIUS,
 } from "./types";
 import { flattenPlatform, generateTerrain, heightAt } from "./terrain";
 import { launchVelocity, stepBall, windAccelFor } from "./physics";
@@ -22,6 +25,10 @@ export const CANNON_HIT_RADIUS = 42; // sagoma-bersaglio generosa (cannone grand
 export const DAMAGE = 20;
 const PLATFORM_HALF = 34; // semi-larghezza della piattaforma sotto il cannone
 const MUZZLE = 60; // distanza dalla quale esce la palla (oltre la canna del cannone)
+export const TARGET_HIT_RADIUS = TARGET_RADIUS + 6; // sagoma-bersaglio del power-up (più piccola di quella del cannone: bonus da abile)
+export const TARGET_SPAWN_CHANCE = 0.22; // probabilità di comparsa a ogni turno (se non già attivo e nessuno è powered)
+export const POWER_TURNS = 3; // durata della modalità power, in propri turni successivi
+export const POWER_DAMAGE_MULTIPLIER = 2; // moltiplicatore del danno inflitto mentre si è in modalità power
 
 function emptyAim(): AimState {
   return {
@@ -39,6 +46,10 @@ function emptyBall(): Ball {
   return { x: 0, y: 0, vx: 0, vy: 0, active: false };
 }
 
+function emptyTarget(): PowerTarget {
+  return { active: false, x: 0, y: 0, shotsLeft: 0 };
+}
+
 function randomWind(rng: () => number): Wind {
   return { dirX: rng() < 0.5 ? -1 : 1, strength: rng() };
 }
@@ -47,6 +58,17 @@ const BIOMES: Biome[] = ["erba", "sabbia", "neve", "spiaggia"];
 
 function randomBiome(rng: () => number): Biome {
   return BIOMES[Math.floor(rng() * BIOMES.length)];
+}
+
+function maybeSpawnTarget(state: GameState): void {
+  if (state.target.active) return; // c'è già un bersaglio in cielo
+  if (state.power.red > 0 || state.power.blue > 0) return; // qualcuno è in modalità power
+  if (Math.random() >= TARGET_SPAWN_CHANCE) return; // niente questo turno
+
+  const marginX = state.width * 0.25;
+  const x = marginX + Math.random() * (state.width - marginX * 2);
+  const y = state.height * 0.2;
+  state.target = { active: true, x, y, shotsLeft: 2 };
 }
 
 function other(p: PlayerId): PlayerId {
@@ -81,6 +103,8 @@ export function createGame(
     wind: randomWind(rng),
     shotsSinceWindChange: 0,
     biome: randomBiome(rng),
+    target: emptyTarget(),
+    power: { red: 0, blue: 0 },
     phase: "title",
     current: first,
     winner: null,
@@ -103,6 +127,7 @@ export function createGame(
 /** Dalla schermata titolo (o per rigiocare) entra nella fase di mira. */
 export function startMatch(state: GameState): void {
   state.phase = "aiming";
+  maybeSpawnTarget(state);
 }
 
 /** Inizia a mirare se si preme abbastanza vicino al cannone di turno. */
@@ -159,41 +184,70 @@ export function update(state: GameState, dt: number): void {
   resolveBall(state);
 }
 
+type ShotOutcome = "targetHit" | "enemyHit" | "miss";
+
 function resolveBall(state: GameState): void {
   const b = state.ball;
   const enemyId = other(state.current);
   const enemy = state.cannons[enemyId];
 
-  // Esce dai lati dello schermo → tiro a vuoto.
-  if (b.x < 0 || b.x > state.width) {
-    endShot(state, false, enemyId);
-    return;
-  }
-
-  // Colpo diretto alla sagoma (generosa) del cannone nemico.
-  if (Math.hypot(b.x - enemy.x, b.y - enemy.y) <= CANNON_HIT_RADIUS + BALL_RADIUS) {
-    endShot(state, true, enemyId);
-    return;
-  }
-
-  // Tocca il terreno → tiro a vuoto. (Il proprio cannone è ignorato: nessun autogol.)
-  if (b.y + BALL_RADIUS >= heightAt(state.terrain, b.x)) {
-    endShot(state, false, enemyId);
-  }
-}
-
-function endShot(state: GameState, hit: boolean, enemyId: PlayerId): void {
-  state.ball.active = false;
-
-  if (hit) {
-    const enemy = state.cannons[enemyId];
-    enemy.health = Math.max(0, enemy.health - DAMAGE);
-    if (enemy.health <= 0) {
-      state.phase = "gameover";
-      state.winner = state.current;
+  // 1. Bersaglio power-up (se attivo): ha priorità su tutto il resto.
+  if (state.target.active) {
+    const dTarget = Math.hypot(b.x - state.target.x, b.y - state.target.y);
+    if (dTarget <= TARGET_HIT_RADIUS + BALL_RADIUS) {
+      endShot(state, "targetHit", enemyId);
       return;
     }
   }
+
+  // 2. Esce dai lati dello schermo → tiro a vuoto.
+  if (b.x < 0 || b.x > state.width) {
+    endShot(state, "miss", enemyId);
+    return;
+  }
+
+  // 3. Colpo diretto alla sagoma del cannone nemico (raddoppiata se è in modalità power).
+  const enemyHitRadius =
+    state.power[enemyId] > 0 ? CANNON_HIT_RADIUS * POWER_SIZE_MULTIPLIER : CANNON_HIT_RADIUS;
+  if (Math.hypot(b.x - enemy.x, b.y - enemy.y) <= enemyHitRadius + BALL_RADIUS) {
+    endShot(state, "enemyHit", enemyId);
+    return;
+  }
+
+  // 4. Tocca il terreno → tiro a vuoto. (Il proprio cannone è ignorato: nessun autogol.)
+  if (b.y + BALL_RADIUS >= heightAt(state.terrain, b.x)) {
+    endShot(state, "miss", enemyId);
+  }
+}
+
+function endShot(state: GameState, outcome: ShotOutcome, enemyId: PlayerId): void {
+  state.ball.active = false;
+  const shooter = state.current;
+  // "Ero in modalità power PRIMA di questo tiro?" — decide il moltiplicatore
+  // del danno. Va calcolato prima di scalare il contatore qui sotto, altrimenti
+  // il terzo (ultimo) turno powered perderebbe il raddoppio del danno.
+  const wasPowered = state.power[shooter] > 0;
+
+  if (outcome === "targetHit") {
+    state.target = emptyTarget();
+  } else if (outcome === "enemyHit") {
+    const enemy = state.cannons[enemyId];
+    const damage = wasPowered ? DAMAGE * POWER_DAMAGE_MULTIPLIER : DAMAGE;
+    enemy.health = Math.max(0, enemy.health - damage);
+    if (enemy.health <= 0) {
+      state.phase = "gameover";
+      state.winner = shooter;
+      return;
+    }
+  }
+
+  // La modalità power del tiratore scala di 1 per il tiro appena concluso
+  // (a segno, a vuoto, o sul bersaglio: conta comunque come un turno).
+  if (wasPowered) state.power[shooter] -= 1;
+
+  // Il tiro che colpisce il bersaglio attiva la modalità power: vale dal
+  // turno SUCCESSIVO di questo giocatore (questo tiro non è uno dei 3).
+  if (outcome === "targetHit") state.power[shooter] = POWER_TURNS;
 
   // Vento: cambia ogni 2 tiri conclusi (un round completo di entrambi i giocatori).
   state.shotsSinceWindChange += 1;
@@ -203,6 +257,7 @@ function endShot(state: GameState, hit: boolean, enemyId: PlayerId): void {
   }
 
   // Passa il turno.
-  state.current = other(state.current);
+  state.current = other(shooter);
   state.phase = "aiming";
+  maybeSpawnTarget(state);
 }
